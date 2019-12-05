@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-const { makeItDIRPdrop, writeJSON } = require('../lib/file-sys-funct');
+const { makeItDIRPdrop, writeJSON, readJSON } = require('../lib/file-sys-funct');
 
 describe('fs functions', () => {
     // describe('mkdirp', () => {
@@ -10,17 +10,17 @@ describe('fs functions', () => {
     //     });
     // });
     beforeAll(() => {
-        return makeItDIRPdrop('./it/got');
+        return makeItDIRPdrop('./calvin');
     });
             
     describe('write JSON', () => {
         it('should turn an object to JSON and write to a file', () => {
-            return writeJSON('./it/got/thing', {
+            return writeJSON('./calvin/coolidge', {
                 cool: true,
                 num: 2
             })
                 .then(() => {
-                    return fs.readFile('./it/got/thing', 'utf8');
+                    return fs.readFile('./calvin/coolidge', 'utf8');
                 })
                 .then(contents => {
                     expect(JSON.parse(contents)).toEqual(({
@@ -28,6 +28,19 @@ describe('fs functions', () => {
                         num: 2
                     }
                     ));
+                });
+        });
+
+    });
+
+    describe('reading dat JaySOOOOOOOON', () => {
+        it('will read the things', () => {
+            return readJSON('./calvin/coolidge')
+                .then(contents => {
+                    expect(contents).toEqual({
+                        cool: true,
+                        num: 2
+                    });
                 });
         });
     });
