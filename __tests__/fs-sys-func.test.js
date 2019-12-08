@@ -1,14 +1,8 @@
 const fs = require('fs').promises;
-const { makeItDIRPdrop, writeJSON, readJSON } = require('../lib/file-sys-funct');
+const { makeItDIRPdrop, writeJSON, readJSON, updateJSON, readDirectoryJSON, deleteFile } = require('../lib/file-sys-funct');
 
 describe('fs functions', () => {
-    // describe('mkdirp', () => {
-    //     it('should create directory and all parent directories', () => {
-    //         return mkdirp('./this/is/it')
-    //         .then()
-    //         expect('yourMom');
-    //     });
-    // });
+
     beforeAll(() => {
         return makeItDIRPdrop('./calvin');
     });
@@ -44,4 +38,44 @@ describe('fs functions', () => {
                 });
         });
     });
+
+    describe('reading the files in a directory as objects', () => {
+        it('will return the objects in the directory as objects', () => {
+            
+        });
+    });
+
+    describe('readDirectoryJSON', () => {
+        it('read all files in a directory as objects', () => {
+            return readDirectoryJSON('./calvin/coolidge')
+                .then(allItems => {
+                    expect(fs.readdir).toHaveBeenLastCalledWith('./calvin/coolidge');
+                    expect(allItems).toEqual([
+                        { name: 'Calvin Coolidge' },
+                        { name: 'Calvin Coolidge' }
+                    ]);
+                });
+        });
+    });
+
+    describe('updateJSON', () => {
+        it('update a files JSON', () => {
+            return updateJSON('./calvin/coolidge', { age: 69 })
+                .then(updateItem => {
+                    expect(fs.readFile).toHaveBeenLastCalledWith('./calvin/coolidge', 'utf8');
+                    expect(updateItem).toEqual({ name: 'Calvin Coolidge', age: 69 });
+                });
+        });
+    });
+
+    describe('deleteFile', () => {
+        it('deletes a file', () => {
+            return deleteFile('./calvin/coolidge')
+                .then(() => {
+                    expect(fs.unlink).toHaveBeenLastCalledWith('./calvin/coolidge');
+                });
+        });
+    });
+
 });
+
