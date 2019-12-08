@@ -1,28 +1,36 @@
 const fs = require('fs').promises;
 const { makeItDIRPdrop, writeJSON, readJSON, updateJSON, readDirectoryJSON, deleteFile } = require('../lib/file-sys-funct');
 
-describe('fs functions', () => {
+jest.mock('fs', () => ({
+    promises: {
+      mkdir: jest.fn(() => Promise.resolve()),
+      writeFile: jest.fn(() => Promise.resolve()),
+      readFile: jest.fn(() => Promise.resolve('{"name":"Calvin Coolidge"}')),
+      readdir: jest.fn(() => Promise.resolve(['./calvin', './coolidge'])),
+      unlink: jest.fn(() => Promise.resolve())
+    }
+  }));
 
-    beforeAll(() => {
-        return makeItDIRPdrop('./calvin');
+  describe('mkdrpdrp', () => {
+    it('should make a directory and all parent directories', () => { return makeItDIRPdrop('./calvin/coolidge')
+      .then(() => {
+        expect(fs.mkdir).toHaveBeenLastCalledWith('./calvin/coolidge', { recursive: true });
+      });
     });
-            
+  });
+
+
     describe('write JSON', () => {
+        const dog = {
+            cool: true, 
+            num: 2
+        }; 
+
         it('should turn an object to JSON and write to a file', () => {
-            return writeJSON('./calvin/coolidge', {
-                cool: true,
-                num: 2
-            })
-                .then(() => {
-                    return fs.readFile('./calvin/coolidge', 'utf8');
-                })
-                .then(contents => {
-                    expect(JSON.parse(contents)).toEqual(({
-                        cool: true,
-                        num: 2
-                    }
-                    ));
-                });
+            return writeJSON('./calvin/coolidge', dog)
+            .then(dog => {
+                expect(fs.writeFile).toHaveBeenCalledWith('./calvin/coolidge', JSON.stringify(dog));
+            });
         });
 
     });
@@ -30,14 +38,12 @@ describe('fs functions', () => {
     describe('reading dat JaySOOOOOOOON', () => {
         it('will read the things', () => {
             return readJSON('./calvin/coolidge')
-                .then(contents => {
-                    expect(contents).toEqual({
-                        cool: true,
-                        num: 2
+            .then(() => {
+                expect(fs.readFile).toHaveBeenLastCalledWith('./calvin/coolidge');
                     });
                 });
         });
-    });
+ 
 
     describe('reading the files in a directory as objects', () => {
         it('will return the objects in the directory as objects', () => {
@@ -62,7 +68,7 @@ describe('fs functions', () => {
         it('update a files JSON', () => {
             return updateJSON('./calvin/coolidge', { age: 69 })
                 .then(updateItem => {
-                    expect(fs.readFile).toHaveBeenLastCalledWith('./calvin/coolidge', 'utf8');
+                    expect(fs.readFile).toHaveBeenLastCalledWith('./calvin/coolidge');
                     expect(updateItem).toEqual({ name: 'Calvin Coolidge', age: 69 });
                 });
         });
@@ -77,5 +83,4 @@ describe('fs functions', () => {
         });
     });
 
-});
 
